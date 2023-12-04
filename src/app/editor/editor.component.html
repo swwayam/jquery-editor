@@ -1,0 +1,13 @@
+<div>
+    @for (txt of txtFields; track $index) {
+        <div>
+            <label>{{txt.label}}</label>
+            <input type="text" [value]="txt.value" [(ngModel)]="txt.value" (ngModelChange)="changeTxt(txt)">
+            <input type="color" [value]="txt.color" [(ngModel)]="txt.color" (ngModelChange)="changeColor(txt)">
+            <input type="number" [value]="txt.fontSize" [(ngModel)]="txt.fontSize" (ngModelChange)="changeFontSize(txt)" >
+        </div>
+    }
+    
+
+</div>
+<iframe src="assets/Template_Business2_300x250/index.html" #myIframe (load)="onIframeLoad(myIframe)"></iframe>
