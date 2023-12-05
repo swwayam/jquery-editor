@@ -1,4 +1,11 @@
-import { Component, ElementRef, OnInit, ViewChild , OnChanges, SimpleChanges} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { log } from 'console';
@@ -13,66 +20,67 @@ declare var $: any;
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent implements OnInit, OnChanges{
-  type = "all"
-  size = "/assets/test291123a3_assets/test291123a3/test291123a3/index.html"
+export class AppComponent implements OnInit, OnChanges {
+  type = 'all';
+  size = '/assets/test291123a3_assets/test291123a3/test291123a3/index.html';
   txtFields: any[] = [];
-  sanitizedURL = this.sanitizer.bypassSecurityTrustResourceUrl(this.size)
+  sanitizedURL = this.sanitizer.bypassSecurityTrustResourceUrl(this.size);
 
   iframe: any;
 
-  data : any[] = []
-  
+  data: any[] = [];
+
   ngOnInit(): void {
-      console.log("init");
-      
+    console.log('init');
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("changed");
-    
+    console.log('changed');
   }
-  
 
-  constructor(private sanitizer: DomSanitizer) { }
-  
-
+  constructor(private sanitizer: DomSanitizer) {}
 
   // Using filenames we will auto take the sizes
-  // type 
+  // type
 
-  changeUrl(url : string, type: string){
-    localStorage.setItem("data", JSON.stringify(this.data))
+  changeUrl(url: string, type: string) {
     this.sanitizedURL = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    this.type = type
+    this.type = type;
   }
 
+  // Sanitize the URL
 
-// Sanitize the URL
+  setG(){
+    for(const el of this.data){
+      if(el.size == "all"){
+        el.global = true
+      }
+    }
+    console.log(this.data);
+    
+  }
 
-async onIframeLoad(myFrame: HTMLIFrameElement) {
-
-  
-
+  async onIframeLoad(myFrame: HTMLIFrameElement) {
     console.log('Iframe has finished loading.');
-    
 
-    console.log("below of local");
-    
+    console.log('below of local');
+
     // You can perform actions here once the iframe has loaded
     this.iframe = await myFrame.contentDocument?.body;
     let allID = this.iframe?.querySelectorAll('[id^=sd_]');
     // sort
 
-    function getActualFontInInt(fontSize : any){
-      return parseInt(fontSize.substring(0, fontSize.length - 2))
+    function getActualFontInInt(fontSize: any) {
+      return parseInt(fontSize.substring(0, fontSize.length - 2));
     }
+
+    
 
     allID?.forEach((el: any) => {
       let value;
-    
+
       let id;
- 
+
       if (el.innerHTML.valueOf() == '') {
         let a = el as HTMLImageElement;
         value = a.src;
@@ -80,12 +88,22 @@ async onIframeLoad(myFrame: HTMLIFrameElement) {
         value = el.innerHTML.valueOf();
       }
 
-      id = el.id
+      id = el.id;
       let editable = el.id.split('_');
+
       // console.log(value);
       if (editable[1] == 'txt') {
+          for (const el of this.data) {
+            if(el.size == this.type && el.label == editable[2]){
+              this.changeTxt(el)
+              this.changeColor(el)
+              this.changeFontSize(el)
+              return
+            }
+            console.log(el);
+          }
         this.data.push({
-          size:this.type,
+          size: this.type,
           label: editable[2],
           value: value,
           type: 'txt',
@@ -95,49 +113,52 @@ async onIframeLoad(myFrame: HTMLIFrameElement) {
       }
     });
 
-    if(localStorage.getItem('data') != null){
-      this.data = JSON.parse(localStorage.getItem('data') || "")
-
-    }
-
     // All -> update
     // 300x50 -> all -> sdfljksd -> all
     // 700x350 -> all -> asdfl -> all
 
     // console.log(this.txtFields);
-
-  
   }
 
+
+
   changeTxt(txt: any) {
-    console.log(txt);
+    // if(txt.global == true){
+    //   for (const el of this.data) {
+    //     el.color = txt.color
+    //     el.value = txt.value
+    //     el.fontSize = txt.fontSize
+    //   }
+    // }
 
     let id = 'sd_' + txt.type + '_' + txt.label;
     this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
+    console.log(txt);
   }
 
-  changeColor(txt: any){
+  changeColor(txt: any) {
     // console.log(txt);
     let id = 'sd_' + txt.type + '_' + txt.label;
     this.iframe.querySelector(`#${id}`).style.color = txt.color;
+    this.iframe.querySelector(`#${id}`).style.webkitTextFillColor = txt.color;
+    console.log(txt);
   }
 
-  changeFontSize(txt: any){
+  changeFontSize(txt: any) {
     // console.log(txt);
     let id = 'sd_' + txt.type + '_' + txt.label;
-    this.iframe.querySelector(`#${id}`).style.fontSize = txt.fontSize + "px";
+    this.iframe.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
   }
 
-
-  async read(){
-    let a = new FileReader()
+  async read() {
+    let a = new FileReader();
     // a.readAsArrayBuffer('src\assets\test291123a3_assets (1)')
   }
 
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
-    // console.log(file); 
-    
+    // console.log(file);
+
     const reader = new FileReader();
     reader.onload = () => {
       const fileContent = reader.result as string;
@@ -146,5 +167,4 @@ async onIframeLoad(myFrame: HTMLIFrameElement) {
     };
     reader.readAsText(file);
   }
-
 }
