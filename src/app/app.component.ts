@@ -26,6 +26,12 @@ export class AppComponent implements OnInit, OnChanges {
   txtFields: any[] = [];
   sanitizedURL = this.sanitizer.bypassSecurityTrustResourceUrl(this.size);
 
+  // allSizes -> reflect changes
+  // local 
+
+  allSizes : boolean = false
+
+
   iframe: any;
 
   data: any[] = [];
@@ -123,13 +129,15 @@ export class AppComponent implements OnInit, OnChanges {
 
 
   changeTxt(txt: any) {
-    // if(txt.global == true){
-    //   for (const el of this.data) {
-    //     el.color = txt.color
-    //     el.value = txt.value
-    //     el.fontSize = txt.fontSize
-    //   }
-    // }
+    if(txt.global == true){
+      for (const el of this.data) {
+        if(txt.label = el.label){
+          el.color = txt.color
+          el.value = txt.value
+          el.fontSize = txt.fontSize
+        }
+      }
+    }
 
     let id = 'sd_' + txt.type + '_' + txt.label;
     this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
