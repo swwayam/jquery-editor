@@ -1,24 +1,28 @@
 <div style="display: flex; justify-content: space-between;">
     <ul>
         <li (click)="changeUrl('/assets/test291123a3_assets/test291123a3/test291123a3/index.html', 'all')">All</li>
-        <li (click)="changeUrl('/assets/test291123a3_assets/test291123a3_300x600/test291123a3_300x600/index.html', '300x600')">300x600</li>
-        <li (click)="changeUrl('/assets/test291123a3_assets/test291123a3_320x50/test291123a3_320x50/index.html','320x50')">320x50</li>
+        <li
+            (click)="changeUrl('/assets/test291123a3_assets/test291123a3_300x600/test291123a3_300x600/index.html', '300x600')">
+            300x600</li>
+        <li
+            (click)="changeUrl('/assets/test291123a3_assets/test291123a3_320x50/test291123a3_320x50/index.html','320x50')">
+            320x50</li>
     </ul>
     <!-- <button (click)="setG()">All</button> -->
     <div>
         @for (el of data; track $index) {
-            @if (el.size == type) {
-                <div>
-                    <label>{{el.label}}</label>
-                    <input type="text" [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el)">
-                    <input type="color" [value]="el.color" [(ngModel)]="el.color" (ngModelChange)="changeColor(el)">
-                    <input type="number" [value]="el.fontSize" [(ngModel)]="el.fontSize" (ngModelChange)="changeFontSize(el)" >
-                </div>
-            }
-           
+        @if (el.size == type) {
+        <div>
+            <label>{{el.label}}</label>
+            <input type="text" [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el)">
+            <input type="color" [value]="el.color" [(ngModel)]="el.color" (ngModelChange)="changeColor(el)">
+            <input type="number" [value]="el.fontSize" [(ngModel)]="el.fontSize" (ngModelChange)="changeFontSize(el)">
+        </div>
         }
-        
+
+        }
+
 
     </div>
-    <iframe  [src]="sanitizedURL" #myIframe (load)="onIframeLoad(myIframe)"></iframe>
+    <iframe width="300" height="600" [src]="sanitizedURL" #myIframe (load)="onIframeLoad(myIframe)"></iframe>
 </div>
