@@ -9,17 +9,25 @@
             320x50</li>
     </ul>
     <!-- <button (click)="setG()">All</button> -->
+
+    <input type="file" (change)="changeImage($event)">
+
     <div>
         @for (el of data; track $index) {
         @if (el.size == type) {
         <div>
             <label>{{el.label}}</label>
+
             <input type="text" [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el)">
-            <input type="color" [value]="el.color" [(ngModel)]="el.color" (ngModelChange)="changeColor(el)">
+            <input id="style1" type="color" [value]="el.color" [(ngModel)]="el.color" (ngModelChange)="changeColor(el)">
             <input type="number" [value]="el.fontSize" [(ngModel)]="el.fontSize" (ngModelChange)="changeFontSize(el)">
+
+
+            <!-- <img [src]="el.pic || output?.base64" [(ngModel)]="el.pic" (click)="cropImage(el.pic)" alt="">-->
+
+
         </div>
         }
-
         }
 
 
