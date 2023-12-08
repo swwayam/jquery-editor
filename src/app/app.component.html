@@ -1,5 +1,11 @@
+
+
+    <div *ngFor="let template of templates; let i = index"  [id]="i" [innerHTML]="template" style="display: none;"></div>
+
+
 <div style="display: flex; justify-content: space-between;">
     <ul>
+        <button (click)="identifySdFields()">get fields</button>
         <li (click)="changeUrl('/assets/test291123a3_assets/test291123a3/test291123a3/index.html', 'all')">All</li>
         <li
             (click)="changeUrl('/assets/test291123a3_assets/test291123a3_300x600/test291123a3_300x600/index.html', '300x600')">

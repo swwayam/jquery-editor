@@ -17,12 +17,22 @@ import {
   NgxCroppedEvent,
   NgxPhotoEditorService,
 } from 'ngx-photo-editor';
+import { DataService } from './data.service';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 declare var $: any;
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, FormsModule, NgxPhotoEditorModule],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    FormsModule,
+    NgxPhotoEditorModule,
+    HttpClientModule,
+    
+  ],
+
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -32,6 +42,96 @@ export class AppComponent implements OnInit, OnChanges {
   txtFields: any[] = [];
   sanitizedURL = this.sanitizer.bypassSecurityTrustResourceUrl(this.size);
   output?: NgxCroppedEvent;
+  /*********************** */
+
+  templates: any[] = []
+
+  constructor(
+    private http: HttpClient,
+    private elementRef: ElementRef,
+    private sanitizer: DomSanitizer,
+    private service: NgxPhotoEditorService,
+    private dataService: DataService
+  ) {}
+
+
+  templateLinks =  [
+    // '/assets/test291123a3_assets/test291123a3/test291123a3/index.html',
+    '/assets/test291123a3_assets/test291123a3_300x600/test291123a3_300x600/index.html',
+    '/assets/test291123a3_assets/test291123a3_320x50/test291123a3_320x50/index.html',
+  ];
+
+
+  // [1,2,3] -> -2
+
+  // 3
+
+
+  editableFields = [];
+
+  // [[{size:300x500, isLinked: true, global: true, htmlTxt: "Heading", type: "txt", value: "The Zoo", color: "#aadf", fontSize: "12px"}, {} ,{}], [], []]
+
+  // Access the native element from ElementRef
+  element = this.elementRef.nativeElement;
+
+  // Create a div element to insert HTML content
+
+  // Append the div to the native element
+
+  identifySdFields() {
+    console.log("called");
+    
+    for (const templateFields of this.templateLinks) {
+      this.http
+        .get(templateFields, {
+          headers: { 'Content-Type': 'html' },
+          responseType: 'text',
+        })
+        .subscribe((val: any) => {
+          const temp = []
+          
+          let div = document.createElement('div')
+          div.innerHTML = val;
+          this.element.appendChild(div);
+          const id = this.element.querySelectorAll('[id^=sd_]');
+          
+
+          let fileName = templateFields.split("/")
+          let size = fileName[fileName.length - 2].split("_")[1]
+          let isLinked = true
+          let global = false
+
+
+          id.forEach((el : any) => {
+            let elId = el.id.split("_")
+            // ["sd", "img", "picture"]
+            let type = elId[1]
+            let htmlTxt = elId[2]
+            let value;
+
+            if(el.innerHTML == ""){
+              value = el.src
+            }else{
+              value = el.innerHTML
+            }
+
+            
+          })
+
+          // this.temp.push(val);
+        });
+    }
+  }
+
+  getOne() {
+    // let a = document.getElementById('0')
+    // console.log(a?.);
+    // let b = a?.querySelector("#sd_txt_heading");
+    // console.log(b);
+    // b?.forEach(el => {
+    //   console.log(el);
+    // })
+  }
 
   // allSizes -> reflect changes
   // local
@@ -50,11 +150,6 @@ export class AppComponent implements OnInit, OnChanges {
     console.log('changed');
   }
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private service: NgxPhotoEditorService
-  ) {}
-
   fileChangeHandler($event: any) {
     this.service
       .open($event, {
@@ -71,6 +166,10 @@ export class AppComponent implements OnInit, OnChanges {
   changeUrl(url: string, type: string) {
     this.sanitizedURL = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     this.type = type;
+  }
+
+  getHTML() {
+    this.identifySdFields();
   }
 
   // Sanitize the URL
