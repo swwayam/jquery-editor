@@ -52,6 +52,9 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   output?: NgxCroppedEvent;
   /*********************** */
   
+  @ViewChild('htmlContainer') htmlContainer!: ElementRef;
+  @ViewChild('dis') dis!: ElementRef;
+
 
   templates: any[] = []
 
@@ -73,10 +76,11 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
 
   templateLinks =  [
+    '/assets/test291123a3_assets/test291123a3_970x250/test291123a3_970x250/index.html',
     '/assets/test291123a3_assets/test291123a3_300x600/test291123a3_300x600/index.html',
     '/assets/test291123a3_assets/test291123a3_320x50/test291123a3_320x50/index.html',
     '/assets/test291123a3_assets/test291123a3_728x90/test291123a3_728x90/index.html',
-    '/assets/test291123a3_assets/test291123a3_970x250/test291123a3_970x250/index.html'
+  
   ];
 
   sanitized = this.templateLinks.map(el => this.sanitizer.bypassSecurityTrustResourceUrl(el))
@@ -96,25 +100,8 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   // Create a div element to insert HTML content
   changeTxt(txt: any) {
-    console.log(txt);
-    
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    console.log(id);
-
-    console.log(this.elementRef.nativeElement);
-    console.log(this.iframe);
-    
-    //  this.element.
-    // console.log(a);
-    // a = "hi"
-    let a =  this.elementRef.nativeElement
-    console.log(a);
-    this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
-
-    
-    
-    
-    console.log(txt);
+    this.htmlContainer.nativeElement.querySelector(`#${id}`).innerHTML = txt.value;
   }
 
 
@@ -131,13 +118,14 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   showData(){
     this.currentIndex.set(this.mapSizes.get("320x50"))
     this.http
-        .get(this.templateLinks[0], {
+        .get(this.templateLinks[2], {
           headers: { 'Content-Type': 'html' },
           responseType: 'text',
         })
         .subscribe((val: any) => {
-          let div = document.createElement('div')
-          div.innerHTML = val
+          // let div = document.createElement('div')
+          // div.innerHTML = val
+          this.htmlContainer.nativeElement.innerHTML = val;
         })
   }
   
@@ -151,12 +139,12 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
           responseType: 'text',
         })
         .subscribe((val: any) => {
-          let div = document.createElement('div')
-          div.innerHTML = val;
-          div.id = "frame"
-          this.element.appendChild(div);
+        
+          this.dis.nativeElement.innerHTML = val;
+          this.dis.nativeElement.style.display = "none"
+          // this.element.appendChild(div);
           
-          const id = div.querySelectorAll('[id^=sd_]');
+          const id = this.dis.nativeElement.querySelectorAll('[id^=sd_]');
           
           let editableFieldsLength = this.editableFields().length
 
@@ -385,32 +373,17 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   changeColor(txt: any) {
     // console.log(txt);
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    this.element.querySelector(`#${id}`).style.color = txt.color;
-    this.element.querySelector(`#${id}`).style.webkitTextFillColor = txt.color;
+    this.htmlContainer.nativeElement.querySelector(`#${id}`).style.color = txt.color;
+    // this.htmlContainer.nativeElement.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
+
+    // this.element.querySelector(`#${id}`).style.color = txt.color;
+    // this.element.querySelector(`#${id}`).style.webkitTextFillColor = txt.color;
     console.log(txt);
   }
 
   changeFontSize(txt: any) {
     // console.log(txt);
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    this.element.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
-  }
-
-  async read() {
-    let a = new FileReader();
-    // a.readAsArrayBuffer('src\assets\test291123a3_assets (1)')
-  }
-
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    // console.log(file);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const fileContent = reader.result as string;
-      console.log('File content:', fileContent);
-      // Perform actions with the file content here
-    };
-    reader.readAsText(file);
+    this.htmlContainer.nativeElement.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
   }
 }
