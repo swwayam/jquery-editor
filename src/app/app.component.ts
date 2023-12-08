@@ -5,6 +5,10 @@ import {
   ViewChild,
   OnChanges,
   SimpleChanges,
+  signal,
+  WritableSignal,
+  AfterViewInit,
+  Renderer2
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
@@ -21,6 +25,9 @@ import { DataService } from './data.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 declare var $: any;
 
+import {CdkDrag} from '@angular/cdk/drag-drop';
+
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -30,36 +37,49 @@ declare var $: any;
     FormsModule,
     NgxPhotoEditorModule,
     HttpClientModule,
-    
+    CdkDrag
   ],
 
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent implements OnInit, OnChanges {
+export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   type = 'all';
+  current !: any;
   size = '/assets/test291123a3_assets/test291123a3/test291123a3/index.html';
   txtFields: any[] = [];
   sanitizedURL = this.sanitizer.bypassSecurityTrustResourceUrl(this.size);
   output?: NgxCroppedEvent;
   /*********************** */
+  
 
   templates: any[] = []
+
+  mapSizes = new Map()
+  currentIndex = signal(0)
+  iframe!: any ;
+
 
   constructor(
     private http: HttpClient,
     private elementRef: ElementRef,
     private sanitizer: DomSanitizer,
     private service: NgxPhotoEditorService,
-    private dataService: DataService
+    private dataService: DataService,
+    private renderer: Renderer2
   ) {}
+
+  
 
 
   templateLinks =  [
-    // '/assets/test291123a3_assets/test291123a3/test291123a3/index.html',
     '/assets/test291123a3_assets/test291123a3_300x600/test291123a3_300x600/index.html',
     '/assets/test291123a3_assets/test291123a3_320x50/test291123a3_320x50/index.html',
+    '/assets/test291123a3_assets/test291123a3_728x90/test291123a3_728x90/index.html',
+    '/assets/test291123a3_assets/test291123a3_970x250/test291123a3_970x250/index.html'
   ];
+
+  sanitized = this.templateLinks.map(el => this.sanitizer.bypassSecurityTrustResourceUrl(el))
 
 
   // [1,2,3] -> -2
@@ -67,7 +87,7 @@ export class AppComponent implements OnInit, OnChanges {
   // 3
 
 
-  editableFields = [];
+  editableFields : WritableSignal<any[]> = signal([]);
 
   // [[{size:300x500, isLinked: true, global: true, htmlTxt: "Heading", type: "txt", value: "The Zoo", color: "#aadf", fontSize: "12px"}, {} ,{}], [], []]
 
@@ -75,12 +95,55 @@ export class AppComponent implements OnInit, OnChanges {
   element = this.elementRef.nativeElement;
 
   // Create a div element to insert HTML content
+  changeTxt(txt: any) {
+    console.log(txt);
+    
+    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+    console.log(id);
+
+    console.log(this.elementRef.nativeElement);
+    console.log(this.iframe);
+    
+    //  this.element.
+    // console.log(a);
+    // a = "hi"
+    let a =  this.elementRef.nativeElement
+    console.log(a);
+    this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
+
+    
+    
+    
+    console.log(txt);
+  }
+
 
   // Append the div to the native element
+  ngOnInit(): void {
+    // document.getElementById("dd")?.setAttribute("cdkDrag", 'true')
+  }
 
-  identifySdFields() {
-    console.log("called");
-    
+  ngAfterViewInit(): void {
+    this.getAllData()
+    this.renderer.setAttribute(document.getElementById("dd"), 'cdkDrag', '');
+  }
+
+  showData(){
+    this.currentIndex.set(this.mapSizes.get("320x50"))
+    this.http
+        .get(this.templateLinks[0], {
+          headers: { 'Content-Type': 'html' },
+          responseType: 'text',
+        })
+        .subscribe((val: any) => {
+          let div = document.createElement('div')
+          div.innerHTML = val
+        })
+  }
+  
+
+  getAllData(){
+    console.log('init');
     for (const templateFields of this.templateLinks) {
       this.http
         .get(templateFields, {
@@ -88,67 +151,85 @@ export class AppComponent implements OnInit, OnChanges {
           responseType: 'text',
         })
         .subscribe((val: any) => {
-          const temp = []
-          
           let div = document.createElement('div')
           div.innerHTML = val;
+          div.id = "frame"
           this.element.appendChild(div);
-          const id = this.element.querySelectorAll('[id^=sd_]');
           
+          const id = div.querySelectorAll('[id^=sd_]');
+          
+          let editableFieldsLength = this.editableFields().length
 
           let fileName = templateFields.split("/")
           let size = fileName[fileName.length - 2].split("_")[1]
           let isLinked = true
-          let global = false
+          let global: boolean;
+          if(editableFieldsLength < 1){
+             global = true
+             this.mapSizes.set("all", 0)
+          }else{
+            global = false
+            this.mapSizes.set(size, editableFieldsLength - 1)
+          }
+
+         
 
 
+          const temp : any = []
+          // if(this.editableFields.length < 1){
           id.forEach((el : any) => {
             let elId = el.id.split("_")
             // ["sd", "img", "picture"]
             let type = elId[1]
             let htmlTxt = elId[2]
             let value;
+            let fontSizePx = window.getComputedStyle(el).fontSize
+            let fontSize = parseInt(fontSizePx.slice(0, fontSizePx.length - 2))
+            let color = window.getComputedStyle(el).color            
+           
+            
 
             if(el.innerHTML == ""){
               value = el.src
+              temp.push({
+            
+                size,
+                isLinked,
+                global,
+                type,
+                htmlTxt,
+                fontSize,
+                color,
+                value
+              })
             }else{
               value = el.innerHTML
+              temp.push({
+                
+                size,
+                isLinked,
+                global,
+                type,
+                htmlTxt,
+                fontSize,
+                color,
+                value
+              })
             }
 
-            
+
           })
 
+
           // this.temp.push(val);
+
+          this.editableFields.update((el) => [...el, temp])
+        // }
         });
-    }
+      }
+      this.showData()
   }
 
-  getOne() {
-    // let a = document.getElementById('0')
-    // console.log(a?.);
-    // let b = a?.querySelector("#sd_txt_heading");
-    // console.log(b);
-    // b?.forEach(el => {
-    //   console.log(el);
-    // })
-  }
-
-  // allSizes -> reflect changes
-  // local
-
-  allSizes: boolean = false;
-
-  iframe: any;
-
-  data: any[] = [];
-
-  ngOnInit(): void {
-    console.log('init');
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log('changed');
-  }
 
   fileChangeHandler($event: any) {
     this.service
@@ -160,6 +241,24 @@ export class AppComponent implements OnInit, OnChanges {
         this.output = data;
       });
   }
+    
+
+/********************** */
+ 
+
+  allSizes: boolean = false;
+
+
+
+  data: any[] = [];
+
+ 
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('changed');
+  }
+
+
   // Using filenames we will auto take the sizes
   // type
 
@@ -168,9 +267,7 @@ export class AppComponent implements OnInit, OnChanges {
     this.type = type;
   }
 
-  getHTML() {
-    this.identifySdFields();
-  }
+ 
 
   // Sanitize the URL
 
@@ -184,54 +281,55 @@ export class AppComponent implements OnInit, OnChanges {
   }
 
   async onIframeLoad(myFrame: HTMLIFrameElement) {
-    console.log('Iframe has finished loading.');
+    // console.log('Iframe has finished loading.');
 
-    console.log('below of local');
+    // console.log('below of local');
 
-    // You can perform actions here once the iframe has loaded
+    // // You can perform actions here once the iframe has loaded
     this.iframe = await myFrame.contentDocument?.body;
-    let allID = this.iframe?.querySelectorAll('[id^=sd_]');
+    let a = this.iframe.querySelector(`#sd_txt_Heading`)
+    a.setAttribute("cdkDrag", '')
     // sort
 
-    function getActualFontInInt(fontSize: any) {
-      return parseInt(fontSize.substring(0, fontSize.length - 2));
-    }
+    // function getActualFontInInt(fontSize: any) {
+    //   return parseInt(fontSize.substring(0, fontSize.length - 2));
+    // }
 
-    allID?.forEach((el: any) => {
-      let value;
+    // allID?.forEach((el: any) => {
+    //   let value;
 
-      let id;
+    //   let id;
 
-      if (el.innerHTML.valueOf() == '') {
-        let a = el as HTMLImageElement;
-        value = a.src;
-      } else {
-        value = el.innerHTML.valueOf();
-      }
+    //   if (el.innerHTML.valueOf() == '') {
+    //     let a = el as HTMLImageElement;
+    //     value = a.src;
+    //   } else {
+    //     value = el.innerHTML.valueOf();
+    //   }
 
-      id = el.id;
-      let editable = el.id.split('_');
+    //   id = el.id;
+    //   let editable = el.id.split('_');
 
-      // console.log(value);
-      if (editable[1] == 'txt') {
-        for (const el of this.data) {
-          if (el.size == this.type && el.label == editable[2]) {
-            this.changeTxt(el);
-            this.changeColor(el);
-            this.changeFontSize(el);
-            return;
-          }
-          console.log(el);
-        }
-        this.data.push({
-          size: this.type,
-          label: editable[2],
-          value: value,
-          type: 'txt',
-          color: window.getComputedStyle(el).color,
-          fontSize: getActualFontInInt(window.getComputedStyle(el).fontSize),
-        });
-      }
+    //   // console.log(value);
+    //   if (editable[1] == 'txt') {
+    //     for (const el of this.data) {
+    //       if (el.size == this.type && el.label == editable[2]) {
+    //         this.changeTxt(el);
+    //         this.changeColor(el);
+    //         this.changeFontSize(el);
+    //         return;
+    //       }
+    //       console.log(el);
+    //     }
+    //     this.data.push({
+    //       size: this.type,
+    //       label: editable[2],
+    //       value: value,
+    //       type: 'txt',
+    //       color: window.getComputedStyle(el).color,
+    //       fontSize: getActualFontInInt(window.getComputedStyle(el).fontSize),
+    //     });
+    //   }
 
       // console.log(value);
       // if (editable[1] == 'img') {
@@ -249,7 +347,7 @@ export class AppComponent implements OnInit, OnChanges {
       //     type: 'img',
       //   });
       // }
-    });
+    // });
 
     // All -> update
     // 300x50 -> all -> sdfljksd -> all
@@ -283,34 +381,19 @@ export class AppComponent implements OnInit, OnChanges {
       });
   }
 
-  changeTxt(txt: any) {
-    if (txt.global == true) {
-      for (const el of this.data) {
-        if ((txt.label = el.label)) {
-          el.color = txt.color;
-          el.value = txt.value;
-          el.fontSize = txt.fontSize;
-        }
-      }
-    }
-
-    let id = 'sd_' + txt.type + '_' + txt.label;
-    this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
-    console.log(txt);
-  }
 
   changeColor(txt: any) {
     // console.log(txt);
-    let id = 'sd_' + txt.type + '_' + txt.label;
-    this.iframe.querySelector(`#${id}`).style.color = txt.color;
-    this.iframe.querySelector(`#${id}`).style.webkitTextFillColor = txt.color;
+    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+    this.element.querySelector(`#${id}`).style.color = txt.color;
+    this.element.querySelector(`#${id}`).style.webkitTextFillColor = txt.color;
     console.log(txt);
   }
 
   changeFontSize(txt: any) {
     // console.log(txt);
-    let id = 'sd_' + txt.type + '_' + txt.label;
-    this.iframe.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
+    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+    this.element.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
   }
 
   async read() {
