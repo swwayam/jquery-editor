@@ -182,9 +182,20 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
             let color = window.getComputedStyle(el).color;
             let fontFamily = window.getComputedStyle(el).fontFamily;
             let backgroundColor = window.getComputedStyle(el).backgroundColor;
-
-            if (el.innerHTML == '') {
+            let href;
+            if (type == 'img') {
               value = el.src;
+              temp.push({
+                size,
+                isLinked,
+                global,
+                type,
+                htmlTxt,            
+                value,
+              });
+            } else if(type == 'btn'){
+              value = el.innerHTML;
+              href = el.href
               temp.push({
                 size,
                 isLinked,
@@ -196,8 +207,9 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
                 backgroundColor,
                 fontFamily,
                 value,
+                href
               });
-            } else {
+            }else{
               value = el.innerHTML;
               temp.push({
                 size,
@@ -209,8 +221,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
                 color,
                 backgroundColor,
                 fontFamily,
-                value,
-              });
+                value              });
             }
           });
 
@@ -255,13 +266,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   async onIframeLoad(myFrame: HTMLIFrameElement) {
     this.iframe = await myFrame.contentDocument?.body;
-    for (const fields of this.editableFields()[this.currentIndex()]) {
-      this.changeTxt(fields);
-      this.changeBgColor(fields);
-      this.changeColor(fields);
-      this.changeFontFamily(fields);
-      //  this.changeUrl(fields)
-    }
+   
   }
 
   checkGlobal(txt : any){
@@ -279,6 +284,8 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
     if(txt.global == true){
       this.checkGlobal(txt)
     }
+
+  
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
     this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
   }
