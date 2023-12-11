@@ -54,7 +54,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   templates: any[] = [];
 
   mapSizes = new Map();
-  currentIndex : WritableSignal<number> = signal(0);
+  currentIndex: WritableSignal<number> = signal(0);
   iframe!: any;
 
   fontFamilyList = [
@@ -103,7 +103,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   // 3
 
-  sizes : any[] = []
+  sizes: any[] = [];
   editableFields: WritableSignal<any[]> = signal([]);
 
   // [[{size:300x500, isLinked: true, global: true, htmlTxt: "Heading", type: "txt", value: "The Zoo", color: "#aadf", fontSize: "12px"}, {} ,{}], [], []]
@@ -125,10 +125,9 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   ngAfterViewInit(): void {
     this.getAllData();
     console.log(this.mapSizes);
-    
   }
 
-  showData(size : number) {
+  showData(size: number) {
     this.currentIndex.set(size);
     this.http
       .get(this.templateLinks[this.currentIndex()], {
@@ -152,10 +151,10 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
         .subscribe((val: any) => {
           let div = document.createElement('div');
           div.innerHTML = val;
-          div.id = 'frame'; 
+          div.id = 'frame';
           this.element.appendChild(div);
           const id = div.querySelectorAll('[id^=sd_]');
-          div.style.display = "none"
+          div.style.display = 'none';
           let editableFieldsLength = this.editableFields().length;
 
           let fileName = templateFields.split('/');
@@ -216,7 +215,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
           });
 
           // this.temp.push(val);
-          this.sizes.push(size)
+          this.sizes.push(size);
           this.editableFields.update((el) => [...el, temp]);
           // }
         });
@@ -253,18 +252,15 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
     this.type = type;
   }
 
-
-
   async onIframeLoad(myFrame: HTMLIFrameElement) {
     this.iframe = await myFrame.contentDocument?.body;
     for (const fields of this.editableFields()[this.currentIndex()]) {
-       this.changeTxt(fields)
-       this.changeBgColor(fields)
-       this.changeColor(fields)
-       this.changeFontFamily(fields)
+      this.changeTxt(fields);
+      this.changeBgColor(fields);
+      this.changeColor(fields);
+      this.changeFontFamily(fields);
       //  this.changeUrl(fields)
     }
-   
   }
 
   cropImage(src: any) {
@@ -320,5 +316,6 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
     this.iframe.querySelector(`#${id}`).style.fontFamily = txt.fontFamily;
   }
 
-
+  link() {}
+  unlink() {}
 }
