@@ -51,6 +51,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   output?: NgxCroppedEvent;
   /*********************** */
 
+  commonFields: WritableSignal<any[]> = signal([])
   templates: any[] = [];
 
   mapSizes = new Map();
@@ -112,10 +113,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   element = this.elementRef.nativeElement;
 
   // Create a div element to insert HTML content
-  changeTxt(txt: any) {
-    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
-  }
+  
 
   // Append the div to the native element
   ngOnInit(): void {
@@ -138,10 +136,11 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
         let div = document.createElement('div');
         div.innerHTML = val;
       });
+      console.log(this.commonFields());
+      
   }
 
   getAllData() {
-    console.log('init');
     for (const templateFields of this.templateLinks) {
       this.http
         .get(templateFields, {
@@ -164,9 +163,10 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
           if (editableFieldsLength < 1) {
             global = true;
             this.mapSizes.set('all', 0);
+            this.mapSizes.set(size, 0)
           } else {
             global = false;
-            this.mapSizes.set(size, editableFieldsLength - 1);
+            this.mapSizes.set(size, editableFieldsLength);
           }
 
           const temp: any = [];
@@ -221,6 +221,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
         });
     }
     this.showData(0);
+    this.commonFields.set(this.editableFields()[0])
   }
 
   fileChangeHandler($event: any) {
@@ -261,6 +262,25 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
       this.changeFontFamily(fields);
       //  this.changeUrl(fields)
     }
+  }
+
+  checkGlobal(txt : any){
+      for (const element of this.editableFields()) {
+        for (const fields of element) {
+          if(fields.global != true && txt.htmlTxt == fields.htmlTxt){
+            fields.value = txt.value
+          }
+        }
+      }
+    
+  }
+
+  changeTxt(txt: any) {
+    if(txt.global == true){
+      this.checkGlobal(txt)
+    }
+    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+    this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
   }
 
   cropImage(src: any) {
