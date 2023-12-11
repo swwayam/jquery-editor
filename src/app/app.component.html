@@ -1,13 +1,11 @@
+<!-- <div *ngFor="let template of templates; let i = index"  [id]="i" [innerHTML]="template" style="display: none;"></div> -->
 
-
-    <!-- <div *ngFor="let template of templates; let i = index"  [id]="i" [innerHTML]="template" style="display: none;"></div> -->
-
-<div style="width: 200px; height: 400px; background-color: black;" #myElement></div>
+<!-- <div style="width: 200px; height: 400px; background-color: black;" #myElement></div> -->
 <div style="display: flex; justify-content: space-between;">
-    <!-- <button (click)="showData()">get fields</button> -->
+    <button (click)="showData()">get fields</button>
 
-    <!-- <ul>
-        <button (click)="getOne()">get fields</button>
+    <ul>
+        <!-- <button (click)="getOne()">get fields</button> -->
         <li (click)="changeUrl('/assets/test291123a3_assets/test291123a3/test291123a3/index.html', 'all')">All</li>
         <li
             (click)="changeUrl('/assets/test291123a3_assets/test291123a3_300x600/test291123a3_300x600/index.html', '300x600')">
@@ -15,20 +13,25 @@
         <li
             (click)="changeUrl('/assets/test291123a3_assets/test291123a3_320x50/test291123a3_320x50/index.html','320x50')">
             320x50</li>
-    </ul> -->
+    </ul>
     <!-- <button (click)="setG()">All</button> -->
 
     <input type="file" (change)="changeImage($event)">
-    
+
 
 
     <div id="fields">
-        @for (el of editableFields()[1]; track $index) {
+        @for (el of editableFields()[0]; track $index) {
         <div>
             <label>{{el.htmlTxt}}</label>
             <input type="text" [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el)">
             <input id="style1" type="color" [value]="el.color" [(ngModel)]="el.color" (ngModelChange)="changeColor(el)">
             <input type="number" [value]="el.fontSize" [(ngModel)]="el.fontSize" (ngModelChange)="changeFontSize(el)">
+            <input id="style1" type="color" [value]="el.backgroundColor" [(ngModel)]="el.backgroundColor"
+                (ngModelChange)="changeBgColor(el)">
+            <select [ngModel]="el.fontFamily" (ngModelChange)="changeFontFamily($event,el)">
+                <option *ngFor="let i of fontFamilyList" [value]="i">{{i}}</option>
+            </select>
 
 
             <!-- <img [src]="el.pic || output?.base64" [(ngModel)]="el.pic" (click)="cropImage(el.pic)" alt="">-->
@@ -37,6 +40,7 @@
         </div>
         }
 
-        <iframe width="300" height="600" (load)="onIframeLoad(myFrame)" [src]="sanitized[currentIndex()]" #myFrame></iframe>
+        <iframe width="300" height="600" (load)="onIframeLoad(myFrame)" [src]="sanitized[currentIndex()]"
+            #myFrame></iframe>
     </div>
 </div>
