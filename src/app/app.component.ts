@@ -127,17 +127,18 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   showData(size: number) {
     this.currentIndex.set(size);
-    this.http
-      .get(this.templateLinks[this.currentIndex()], {
-        headers: { 'Content-Type': 'html' },
-        responseType: 'text',
-      })
-      .subscribe((val: any) => {
-        let div = document.createElement('div');
-        div.innerHTML = val;
-      });
-      console.log(this.commonFields());
-      
+    
+    // this.http
+    //   .get(this.templateLinks[this.currentIndex()], {
+    //     headers: { 'Content-Type': 'html' },
+    //     responseType: 'text',
+    //   }).subscribe((val: any) => {
+    //     let div = document.createElement('div');
+    //     div.innerHTML = val;
+        
+    //   });
+    //   console.log(this.commonFields());
+     
   }
 
   getAllData() {
@@ -232,7 +233,6 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
         });
     }
     this.showData(0);
-    this.commonFields.set(this.editableFields()[0])
   }
 
   fileChangeHandler($event: any) {
@@ -266,7 +266,13 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   async onIframeLoad(myFrame: HTMLIFrameElement) {
     this.iframe = await myFrame.contentDocument?.body;
-   
+    for(const fields of this.editableFields()[this.currentIndex()]) {
+      this.changeTxt(fields)
+      this.changeBgColor(fields)
+      this.changeColor(fields)
+      this.changeFontFamily(fields)
+     //  this.changeUrl(fields)
+   }
   }
 
   checkGlobal(txt : any){
@@ -284,9 +290,9 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
     if(txt.global == true){
       this.checkGlobal(txt)
     }
-
-  
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+    console.log(id);
+    
     this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
   }
 
@@ -317,28 +323,60 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   changeColor(txt: any) {
-    // console.log(txt);
+    if (txt.global == true) {
+      for (const element of this.editableFields()) {
+        for (const fields of element) {
+          if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
+            fields.color = txt.color;
+          }
+        }
+      }
+    }
+    
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
     this.iframe.querySelector(`#${id}`).style.color = txt.color;
     this.iframe.querySelector(`#${id}`).style.webkitTextFillColor = txt.color;
-    console.log(id);
   }
 
   changeBgColor(txt: any) {
-    // console.log(txt);
+    if (txt.global == true) {
+    for (const element of this.editableFields()) {
+      for (const fields of element) {
+        if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
+          fields.backgroundColor = txt.backgroundColor;
+        }
+      }
+    }
+  }
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
     this.iframe.querySelector(`#${id}`).style.backgroundColor =
       txt.backgroundColor;
-    //this.iframe.querySelector(`#${id}`).style.webkitTextFillColor = txt.color;
   }
 
   changeFontSize(txt: any) {
-    console.log(txt);
+    if (txt.global == true) {
+    for (const element of this.editableFields()) {
+      for (const fields of element) {
+        if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
+          fields.fontSize = txt.fontSize;
+        }
+      }
+    }
+  }
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
     this.iframe.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
   }
 
   changeFontFamily(txt: any) {
+    if (txt.global == true) {
+    for (const element of this.editableFields()) {
+      for (const fields of element) {
+        if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
+          fields.fontFamily = txt.fontFamily;
+        }
+      }
+    }
+  }
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
     this.iframe.querySelector(`#${id}`).style.fontFamily = txt.fontFamily;
   }
