@@ -54,7 +54,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   templates: any[] = [];
 
   mapSizes = new Map();
-  currentIndex = signal(0);
+  currentIndex : WritableSignal<number> = signal(0);
   iframe!: any;
 
   fontFamilyList = [
@@ -103,6 +103,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   // 3
 
+  sizes : any[] = []
   editableFields: WritableSignal<any[]> = signal([]);
 
   // [[{size:300x500, isLinked: true, global: true, htmlTxt: "Heading", type: "txt", value: "The Zoo", color: "#aadf", fontSize: "12px"}, {} ,{}], [], []]
@@ -112,22 +113,8 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   // Create a div element to insert HTML content
   changeTxt(txt: any) {
-    console.log(txt);
-
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    console.log(id);
-
-    console.log(this.elementRef.nativeElement);
-    console.log(this.iframe);
-
-    //  this.element.
-    // console.log(a);
-    // a = "hi"
-    let a = this.elementRef.nativeElement;
-    console.log(a);
     this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
-
-    console.log(txt);
   }
 
   // Append the div to the native element
@@ -137,14 +124,14 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.getAllData();
-    this.renderer.setAttribute(document.getElementById('dd'), 'cdkDrag', '');
+    console.log(this.mapSizes);
+    
   }
 
-  showData() {
-    this.currentIndex.set(this.mapSizes.get('300x600'));
-
+  showData(size : number) {
+    this.currentIndex.set(size);
     this.http
-      .get(this.templateLinks[0], {
+      .get(this.templateLinks[this.currentIndex()], {
         headers: { 'Content-Type': 'html' },
         responseType: 'text',
       })
@@ -165,11 +152,10 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
         .subscribe((val: any) => {
           let div = document.createElement('div');
           div.innerHTML = val;
-          div.id = 'frame';
+          div.id = 'frame'; 
           this.element.appendChild(div);
-
           const id = div.querySelectorAll('[id^=sd_]');
-
+          div.style.display = "none"
           let editableFieldsLength = this.editableFields().length;
 
           let fileName = templateFields.split('/');
@@ -230,12 +216,12 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
           });
 
           // this.temp.push(val);
-
+          this.sizes.push(size)
           this.editableFields.update((el) => [...el, temp]);
           // }
         });
     }
-    this.showData();
+    this.showData(0);
   }
 
   fileChangeHandler($event: any) {
@@ -267,91 +253,18 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
     this.type = type;
   }
 
-  // Sanitize the URL
 
-  setG() {
-    for (const el of this.data) {
-      if (el.size == 'all') {
-        el.global = true;
-      }
-    }
-    console.log(this.data);
-  }
 
   async onIframeLoad(myFrame: HTMLIFrameElement) {
-    // console.log('Iframe has finished loading.');
-
-    // console.log('below of local');
-
-    // // You can perform actions here once the iframe has loaded
     this.iframe = await myFrame.contentDocument?.body;
-    let a = this.iframe.querySelector(`#sd_txt_Heading`);
-    a.setAttribute('cdkDrag', '');
-    // sort
-
-    // function getActualFontInInt(fontSize: any) {
-    //   return parseInt(fontSize.substring(0, fontSize.length - 2));
-    // }
-
-    // allID?.forEach((el: any) => {
-    //   let value;
-
-    //   let id;
-
-    //   if (el.innerHTML.valueOf() == '') {
-    //     let a = el as HTMLImageElement;
-    //     value = a.src;
-    //   } else {
-    //     value = el.innerHTML.valueOf();
-    //   }
-
-    //   id = el.id;
-    //   let editable = el.id.split('_');
-
-    //   // console.log(value);
-    //   if (editable[1] == 'txt') {
-    //     for (const el of this.data) {
-    //       if (el.size == this.type && el.label == editable[2]) {
-    //         this.changeTxt(el);
-    //         this.changeColor(el);
-    //         this.changeFontSize(el);
-    //         return;
-    //       }
-    //       console.log(el);
-    //     }
-    //     this.data.push({
-    //       size: this.type,
-    //       label: editable[2],
-    //       value: value,
-    //       type: 'txt',
-    //       color: window.getComputedStyle(el).color,
-    //       fontSize: getActualFontInInt(window.getComputedStyle(el).fontSize),
-    //     });
-    //   }
-
-    // console.log(value);
-    // if (editable[1] == 'img') {
-    //   for (const el of this.data) {
-    //     if (el.size == this.type && el.label == editable[2]) {
-    //       this.cropImage(el);
-    //       return;
-    //     }
-    //     console.log(el);
-    //   }
-    //   this.data.push({
-    //     size: this.type,
-    //     label: editable[2],
-    //     pic: value,
-    //     type: 'img',
-    //   });
-    // }
-    // });
-
-    // All -> update
-    // 300x50 -> all -> sdfljksd -> all
-    // 700x350 -> all -> asdfl -> all
-
-    // console.log(this.txtFields);
+    for (const fields of this.editableFields()[this.currentIndex()]) {
+       this.changeTxt(fields)
+       this.changeBgColor(fields)
+       this.changeColor(fields)
+       this.changeFontFamily(fields)
+      //  this.changeUrl(fields)
+    }
+   
   }
 
   cropImage(src: any) {
@@ -366,6 +279,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
         this.iframe.querySelector(`#${id}`).src = this.output.base64;
       });
   }
+
   changeImage($event: any) {
     let id = 'sd_img_Picture';
     this.service
@@ -401,26 +315,10 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
     this.iframe.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
   }
 
-  changeFontFamily(val: any, txt: any) {
+  changeFontFamily(txt: any) {
     let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    this.iframe.querySelector(`#${id}`).style.fontFamily = val;
+    this.iframe.querySelector(`#${id}`).style.fontFamily = txt.fontFamily;
   }
 
-  async read() {
-    let a = new FileReader();
-    // a.readAsArrayBuffer('src\assets\test291123a3_assets (1)')
-  }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    // console.log(file);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const fileContent = reader.result as string;
-      console.log('File content:', fileContent);
-      // Perform actions with the file content here
-    };
-    reader.readAsText(file);
-  }
 }
