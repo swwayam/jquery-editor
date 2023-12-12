@@ -48,7 +48,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   output?: NgxCroppedEvent;
   /*********************** */
 
-  commonFields: any[] = []
+  commonFields: any[] = [];
   templates: any[] = [];
 
   mapSizes = new Map();
@@ -103,14 +103,13 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   sizes: any[] = [];
   editableFields: WritableSignal<any[]> = signal([]);
-  commonIndex !: any
+  commonIndex!: any;
   // [[{size:300x500, isLinked: true, global: true, htmlTxt: "Heading", type: "txt", value: "The Zoo", color: "#aadf", fontSize: "12px"}, {} ,{}], [], []]
 
   // Access the native element from ElementRef
   element = this.elementRef.nativeElement;
 
   // Create a div element to insert HTML content
-  
 
   // Append the div to the native element
   ngOnInit(): void {
@@ -118,20 +117,18 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    
     console.log(this.mapSizes);
   }
 
-  changeMaster(){
+  changeMaster() {
     // this.commonFields
   }
 
   showData(size: number) {
     this.currentIndex.set(size);
     console.log(this.editableFields());
-    this.commonIndex = this.mapSizes.get("all")
+    this.commonIndex = this.mapSizes.get('all');
 
-    
     // this.http
     //   .get(this.templateLinks[this.currentIndex()], {
     //     headers: { 'Content-Type': 'html' },
@@ -139,10 +136,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     //   }).subscribe((val: any) => {
     //     let div = document.createElement('div');
     //     div.innerHTML = val;
-        
+
     //   });
     //   console.log(this.commonFields());
-     
   }
 
   getAllData() {
@@ -168,7 +164,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           if (editableFieldsLength < 1) {
             global = true;
             this.mapSizes.set('all', 0);
-            this.mapSizes.set(size, 0)
+            this.mapSizes.set(size, 0);
           } else {
             global = false;
             this.mapSizes.set(size, editableFieldsLength);
@@ -195,12 +191,12 @@ export class AppComponent implements OnInit, AfterViewInit {
                 isLinked,
                 global,
                 type,
-                htmlTxt,            
+                htmlTxt,
                 value,
               });
-            } else if(type == 'btn'){
+            } else if (type == 'btn') {
               value = el.innerHTML;
-              href = el.href
+              href = el.href;
               temp.push({
                 size,
                 isLinked,
@@ -212,9 +208,9 @@ export class AppComponent implements OnInit, AfterViewInit {
                 backgroundColor,
                 fontFamily,
                 value,
-                href
+                href,
               });
-            }else{
+            } else {
               value = el.innerHTML;
               temp.push({
                 size,
@@ -226,7 +222,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                 color,
                 backgroundColor,
                 fontFamily,
-                value              });
+                value,
+              });
             }
           });
 
@@ -236,10 +233,8 @@ export class AppComponent implements OnInit, AfterViewInit {
           // }
         });
     }
-    this.commonFields.push(this.editableFields()[0])
+    this.commonFields.push(this.editableFields()[0]);
     this.showData(0);
-   
-    
   }
 
   fileChangeHandler($event: any) {
@@ -259,46 +254,46 @@ export class AppComponent implements OnInit, AfterViewInit {
   // type
   onIframeLoad(myFrame: HTMLIFrameElement) {
     this.iframe = myFrame.contentDocument?.body;
-    if(this.editableFields().length <= 0){
+    if (this.editableFields().length <= 0) {
       this.getAllData();
-    }else{
-      for(const fields of this.editableFields()[this.currentIndex()]) {
-        this.changeTxt(fields, "false")
-        this.changeBgColor(fields)
-        this.changeColor(fields)
-        this.changeFontFamily(fields)
-       //  this.changeUrl(fields)
-     }
-    }    
+    } else {
+      for (const fields of this.editableFields()[this.currentIndex()]) {
+        this.changeTxt(fields, 'false');
+        this.changeBgColor(fields, 'false');
+        this.changeColor(fields, 'false');
+        this.changeFontFamily(fields, 'false');
+        //  this.changeUrl(fields)
+      }
+    }
   }
 
-
-  changeTxt(txt: any, isLink : any) {
-    if(txt.global == true){
+  changeTxt(txt: any, isLink: any) {
+    if (txt.global == true) {
       for (const element of this.editableFields()) {
         for (const fields of element) {
-          if(fields.global != true && txt.htmlTxt == fields.htmlTxt && fields.isLinked == true){
-            fields.value = txt.value
+          if (
+            fields.global != true &&
+            txt.htmlTxt == fields.htmlTxt &&
+            fields.isLinked == true
+          ) {
+            fields.value = txt.value;
             console.log(fields);
           }
         }
       }
     }
 
-    if(txt.type == "btn" || txt.type == "txt"){
+    if (txt.type == 'btn' || txt.type == 'txt') {
       let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
       this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
 
-      if(txt.global != true && isLink == "true"){
-        txt.isLinked = false
+      if (txt.global != true && isLink == 'true') {
+        txt.isLinked = false;
       }
 
       console.log(txt);
       console.log(this.editableFields());
-      
-      
     }
- 
   }
 
   cropImage(src: any) {
@@ -327,7 +322,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       });
   }
 
-  changeColor(txt: any) {
+  changeColor(txt: any, isLink: any) {
     if (txt.global == true) {
       for (const element of this.editableFields()) {
         for (const fields of element) {
@@ -337,53 +332,73 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
       }
     }
-    
-    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    this.iframe.querySelector(`#${id}`).style.color = txt.color;
-    this.iframe.querySelector(`#${id}`).style.webkitTextFillColor = txt.color;
-  }
+    if (txt.type == 'btn' || txt.type == 'txt') {
+      let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+      this.iframe.querySelector(`#${id}`).style.color = txt.color;
+      this.iframe.querySelector(`#${id}`).style.webkitTextFillColor = txt.color;
 
-  changeBgColor(txt: any) {
-    if (txt.global == true) {
-    for (const element of this.editableFields()) {
-      for (const fields of element) {
-        if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
-          fields.backgroundColor = txt.backgroundColor;
-        }
+      if (txt.global != true && isLink == 'true') {
+        txt.isLinked = false;
       }
     }
   }
-    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    this.iframe.querySelector(`#${id}`).style.backgroundColor =
-      txt.backgroundColor;
-  }
 
-  changeFontSize(txt: any) {
+  changeBgColor(txt: any, isLink: any) {
     if (txt.global == true) {
-    for (const element of this.editableFields()) {
-      for (const fields of element) {
-        if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
-          fields.fontSize = txt.fontSize;
+      for (const element of this.editableFields()) {
+        for (const fields of element) {
+          if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
+            fields.backgroundColor = txt.backgroundColor;
+          }
         }
       }
     }
-  }
-    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    this.iframe.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
-  }
-
-  changeFontFamily(txt: any) {
-    if (txt.global == true) {
-    for (const element of this.editableFields()) {
-      for (const fields of element) {
-        if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
-          fields.fontFamily = txt.fontFamily;
-        }
+    if (txt.type == 'btn' || txt.type == 'txt') {
+      let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+      this.iframe.querySelector(`#${id}`).style.backgroundColor =
+        txt.backgroundColor;
+      if (txt.global != true && isLink == 'true') {
+        txt.isLinked = false;
       }
     }
   }
-    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    this.iframe.querySelector(`#${id}`).style.fontFamily = txt.fontFamily;
+
+  changeFontSize(txt: any, isLink: any) {
+    if (txt.global == true) {
+      for (const element of this.editableFields()) {
+        for (const fields of element) {
+          if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
+            fields.fontSize = txt.fontSize;
+          }
+        }
+      }
+    }
+    if (txt.type == 'btn' || txt.type == 'txt') {
+      let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+      this.iframe.querySelector(`#${id}`).style.fontSize = txt.fontSize + 'px';
+      if (txt.global != true && isLink == 'true') {
+        txt.isLinked = false;
+      }
+    }
+  }
+
+  changeFontFamily(txt: any, isLink: any) {
+    if (txt.global == true) {
+      for (const element of this.editableFields()) {
+        for (const fields of element) {
+          if (fields.global != true && txt.htmlTxt == fields.htmlTxt) {
+            fields.fontFamily = txt.fontFamily;
+          }
+        }
+      }
+    }
+    if (txt.type == 'btn' || txt.type == 'txt') {
+      let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+      this.iframe.querySelector(`#${id}`).style.fontFamily = txt.fontFamily;
+      if (txt.global != true && isLink == 'true') {
+        txt.isLinked = false;
+      }
+    }
   }
 
   link() {}

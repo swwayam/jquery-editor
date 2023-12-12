@@ -11,23 +11,25 @@
 
     <div id="fields">
         @for (el of editableFields()[currentIndex()]; track $index) {
-            <!-- @if (el.type == "txt") { -->
-                <div>
-                    <label>{{el.htmlTxt}}</label>
-                    <button (click)="link()">link</button><button (click)="unlink()">Unlink</button><input type="text"
-                        [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el, 'true')">
-                    <input id="style1" type="color" [value]="el.color" [(ngModel)]="el.color" (ngModelChange)="changeColor(el)">
-                    <input type="number" [value]="el.fontSize" [(ngModel)]="el.fontSize" (ngModelChange)="changeFontSize(el)">
-                    <input id="style1" type="color" [value]="el.backgroundColor" [(ngModel)]="el.backgroundColor"
-                        (ngModelChange)="changeBgColor(el)">
-                    <select [(ngModel)]="el.fontFamily" (ngModelChange)="changeFontFamily(el)">
-                        <option *ngFor="let i of fontFamilyList" [value]="i">{{i}}</option>
-                    </select>
-        
-        
-                </div>
-            <!-- }@else if (el.type == "btn") { -->
-                <!-- <div>
+        <!-- @if (el.type == "txt") { -->
+        <div>
+            <label>{{el.htmlTxt}}</label>
+            <button (click)="link()">link</button><button (click)="unlink()">Unlink</button><input type="text"
+                [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el, 'true')">
+            <input id="style1" type="color" [value]="el.color" [(ngModel)]="el.color"
+                (ngModelChange)="changeColor(el, 'true')">
+            <input type="number" [value]="el.fontSize" [(ngModel)]="el.fontSize"
+                (ngModelChange)="changeFontSize(el, 'true')">
+            <input id="style1" type="color" [value]="el.backgroundColor" [(ngModel)]="el.backgroundColor"
+                (ngModelChange)="changeBgColor(el, 'true')">
+            <select [(ngModel)]="el.fontFamily" (ngModelChange)="changeFontFamily(el, 'true')">
+                <option *ngFor="let i of fontFamilyList" [value]="i">{{i}}</option>
+            </select>
+
+
+        </div>
+        <!-- }@else if (el.type == "btn") { -->
+        <!-- <div>
                     <label>{{el.htmlTxt}}</label>
                     <button (click)="link()">link</button><button (click)="unlink()">Unlink</button><input type="text"
                         [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el)">
