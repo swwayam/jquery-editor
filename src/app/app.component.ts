@@ -42,16 +42,13 @@ import { CdkDrag } from '@angular/cdk/drag-drop';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent implements OnInit, OnChanges, AfterViewInit {
-  type = 'all';
+export class AppComponent implements OnInit, AfterViewInit {
   current!: any;
-  size = '/assets/test291123a3_assets/test291123a3/test291123a3/index.html';
   txtFields: any[] = [];
-  sanitizedURL = this.sanitizer.bypassSecurityTrustResourceUrl(this.size);
   output?: NgxCroppedEvent;
   /*********************** */
 
-  commonFields: WritableSignal<any[]> = signal([])
+  commonFields: any[] = []
   templates: any[] = [];
 
   mapSizes = new Map();
@@ -106,7 +103,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   sizes: any[] = [];
   editableFields: WritableSignal<any[]> = signal([]);
-
+  commonIndex !: any
   // [[{size:300x500, isLinked: true, global: true, htmlTxt: "Heading", type: "txt", value: "The Zoo", color: "#aadf", fontSize: "12px"}, {} ,{}], [], []]
 
   // Access the native element from ElementRef
@@ -121,12 +118,19 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.getAllData();
+    
     console.log(this.mapSizes);
+  }
+
+  changeMaster(){
+    // this.commonFields
   }
 
   showData(size: number) {
     this.currentIndex.set(size);
+    console.log(this.editableFields());
+    this.commonIndex = this.mapSizes.get("all")
+
     
     // this.http
     //   .get(this.templateLinks[this.currentIndex()], {
@@ -232,7 +236,10 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
           // }
         });
     }
+    this.commonFields.push(this.editableFields()[0])
     this.showData(0);
+   
+    
   }
 
   fileChangeHandler($event: any) {
@@ -248,52 +255,50 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit {
 
   /********************** */
 
-  allSizes: boolean = false;
-
-  data: any[] = [];
-
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log('changed');
-  }
-
   // Using filenames we will auto take the sizes
   // type
-
-  changeUrl(url: string, type: string) {
-    this.sanitizedURL = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    this.type = type;
+  onIframeLoad(myFrame: HTMLIFrameElement) {
+    this.iframe = myFrame.contentDocument?.body;
+    if(this.editableFields().length <= 0){
+      this.getAllData();
+    }else{
+      for(const fields of this.editableFields()[this.currentIndex()]) {
+        this.changeTxt(fields, "false")
+        this.changeBgColor(fields)
+        this.changeColor(fields)
+        this.changeFontFamily(fields)
+       //  this.changeUrl(fields)
+     }
+    }    
   }
 
-  async onIframeLoad(myFrame: HTMLIFrameElement) {
-    this.iframe = await myFrame.contentDocument?.body;
-    for(const fields of this.editableFields()[this.currentIndex()]) {
-      this.changeTxt(fields)
-      this.changeBgColor(fields)
-      this.changeColor(fields)
-      this.changeFontFamily(fields)
-     //  this.changeUrl(fields)
-   }
-  }
 
-  checkGlobal(txt : any){
+  changeTxt(txt: any, isLink : any) {
+    if(txt.global == true){
       for (const element of this.editableFields()) {
         for (const fields of element) {
-          if(fields.global != true && txt.htmlTxt == fields.htmlTxt){
+          if(fields.global != true && txt.htmlTxt == fields.htmlTxt && fields.isLinked == true){
             fields.value = txt.value
+            console.log(fields);
           }
         }
       }
-    
-  }
-
-  changeTxt(txt: any) {
-    if(txt.global == true){
-      this.checkGlobal(txt)
     }
-    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-    console.log(id);
-    
-    this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
+
+    if(txt.type == "btn" || txt.type == "txt"){
+      let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+      this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
+
+      if(txt.global != true && isLink == "true"){
+        txt.isLinked = false
+      }
+
+      console.log(txt);
+      console.log(this.editableFields());
+      
+      
+    }
+ 
   }
 
   cropImage(src: any) {

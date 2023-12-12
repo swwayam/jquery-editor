@@ -11,11 +11,11 @@
 
     <div id="fields">
         @for (el of editableFields()[currentIndex()]; track $index) {
-            @if (el.type == "txt") {
+            <!-- @if (el.type == "txt") { -->
                 <div>
                     <label>{{el.htmlTxt}}</label>
                     <button (click)="link()">link</button><button (click)="unlink()">Unlink</button><input type="text"
-                        [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el)">
+                        [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el, 'true')">
                     <input id="style1" type="color" [value]="el.color" [(ngModel)]="el.color" (ngModelChange)="changeColor(el)">
                     <input type="number" [value]="el.fontSize" [(ngModel)]="el.fontSize" (ngModelChange)="changeFontSize(el)">
                     <input id="style1" type="color" [value]="el.backgroundColor" [(ngModel)]="el.backgroundColor"
@@ -26,8 +26,8 @@
         
         
                 </div>
-            }@else if (el.type == "btn") {
-                <div>
+            <!-- }@else if (el.type == "btn") { -->
+                <!-- <div>
                     <label>{{el.htmlTxt}}</label>
                     <button (click)="link()">link</button><button (click)="unlink()">Unlink</button><input type="text"
                         [value]="el.value" [(ngModel)]="el.value" (ngModelChange)="changeTxt(el)">
@@ -43,10 +43,10 @@
         
                 </div>
             }
-        
+         -->
         }
 
-        <iframe width="300" height="600" (load)="onIframeLoad(myFrame)" [src]="sanitized[currentIndex()]"
+        <iframe width="900" height="600" (load)="onIframeLoad(myFrame)" [src]="sanitized[currentIndex()]"
             #myFrame></iframe>
     </div>
 </div>
