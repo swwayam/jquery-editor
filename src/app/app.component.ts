@@ -253,7 +253,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   // Using filenames we will auto take the sizes
   // type
   onIframeLoad(myFrame: HTMLIFrameElement) {
-    this.iframe = myFrame.contentDocument?.body;
+    this.iframe = myFrame.contentDocument;
     if (this.editableFields().length <= 0) {
       this.getAllData();
     } else {
