@@ -52,7 +52,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   templates: any[] = [];
 
   mapSizes = new Map();
-  currentIndex: WritableSignal<number> = signal(0);
+  currentIndex: number = 0;
   iframe!: any;
 
   fontFamilyList = [
@@ -124,7 +124,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   showData(size: number) {
-    this.currentIndex.set(size);
+    this.currentIndex = size;
     console.log(this.editableFields());
     this.commonIndex = this.mapSizes.get('all');
 
@@ -257,7 +257,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       if (this.editableFields().length <= 0) {
         this.getAllData();
       } else {
-        for (const fields of this.editableFields()[this.currentIndex()]) {
+        for (const fields of this.editableFields()[this.currentIndex]) {
           this.changeTxt(fields, 'false');
           this.changeBgColor(fields, 'false');
           this.changeColor(fields, 'false');

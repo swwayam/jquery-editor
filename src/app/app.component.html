@@ -10,7 +10,7 @@
 
 
     <div id="fields">
-        @for (el of editableFields()[currentIndex()]; track $index) {
+        @for (el of editableFields()[currentIndex]; track $index) {
         <!-- @if (el.type == "txt") { -->
         <div>
             <label>{{el.htmlTxt}}</label>
@@ -48,7 +48,7 @@
          -->
         }
 
-        <iframe width="900" height="600" (load)="onIframeLoad(myFrame)" [src]="sanitized[currentIndex()]"
+        <iframe width="900" height="600" (load)="onIframeLoad(myFrame)" [src]="sanitized[currentIndex]"
             #myFrame></iframe>
     </div>
 </div>
