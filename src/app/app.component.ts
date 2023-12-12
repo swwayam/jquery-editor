@@ -89,7 +89,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     '/assets/test291123a3_assets/test291123a3_300x600/test291123a3_300x600/index.html',
     '/assets/test291123a3_assets/test291123a3_320x50/test291123a3_320x50/index.html',
     '/assets/test291123a3_assets/test291123a3_728x90/test291123a3_728x90/index.html',
-
     '/assets/test291123a3_assets/test291123a3_970x250/test291123a3_970x250/index.html',
   ];
 
@@ -254,17 +253,21 @@ export class AppComponent implements OnInit, AfterViewInit {
   // type
   onIframeLoad(myFrame: HTMLIFrameElement) {
     this.iframe = myFrame.contentDocument;
-    if (this.editableFields().length <= 0) {
-      this.getAllData();
-    } else {
-      for (const fields of this.editableFields()[this.currentIndex()]) {
-        this.changeTxt(fields, 'false');
-        this.changeBgColor(fields, 'false');
-        this.changeColor(fields, 'false');
-        this.changeFontFamily(fields, 'false');
-        //  this.changeUrl(fields)
+    if(this.iframe){
+      if (this.editableFields().length <= 0) {
+        this.getAllData();
+      } else {
+        for (const fields of this.editableFields()[this.currentIndex()]) {
+          this.changeTxt(fields, 'false');
+          this.changeBgColor(fields, 'false');
+          this.changeColor(fields, 'false');
+          this.changeFontFamily(fields, 'false');
+          //  this.changeUrl(fields)
+        }
       }
-    }
+
+    }    
+    
   }
 
   changeTxt(txt: any, isLink: any) {
