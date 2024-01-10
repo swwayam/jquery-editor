@@ -52,7 +52,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   templates: any[] = [];
 
   mapSizes = new Map();
-  currentIndex: number = 0;
+  currentIndex: WritableSignal<number> = signal(0);
   iframe!: any;
 
   fontFamilyList = [
@@ -117,6 +117,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     console.log(this.mapSizes);
+    console.log(this.element)
+    
+    this.getAllData();
+
   }
 
   changeMaster() {
@@ -124,7 +128,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   showData(size: number) {
-    this.currentIndex = size;
+    this.currentIndex.set(size);
     console.log(this.editableFields());
     this.commonIndex = this.mapSizes.get('all');
 
@@ -228,6 +232,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
           // this.temp.push(val);
           this.sizes.push(size);
+          console.log(this.sizes);
+
           this.editableFields.update((el) => [...el, temp]);
           // }
         });
@@ -251,13 +257,13 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   // Using filenames we will auto take the sizes
   // type
-  onIframeLoad(myFrame: HTMLIFrameElement) {
-    this.iframe = myFrame.contentDocument;
-    if(this.iframe){
+ async onIframeLoad(myFrame: HTMLIFrameElement) {
+    this.iframe = await myFrame.contentDocument?.body;
+    if (this.iframe) {
       if (this.editableFields().length <= 0) {
-        this.getAllData();
-      } else {
-        for (const fields of this.editableFields()[this.currentIndex]) {
+        
+      }else{
+        for (const fields of this.editableFields()[this.currentIndex()]) {
           this.changeTxt(fields, 'false');
           this.changeBgColor(fields, 'false');
           this.changeColor(fields, 'false');
@@ -265,30 +271,36 @@ export class AppComponent implements OnInit, AfterViewInit {
           //  this.changeUrl(fields)
         }
       }
-
-    }    
-    
+      
+    }
   }
 
   changeTxt(txt: any, isLink: any) {
-    if (txt.global == true) {
-      for (const element of this.editableFields()) {
-        for (const fields of element) {
-          if (
-            fields.global != true &&
-            txt.htmlTxt == fields.htmlTxt &&
-            fields.isLinked == true
-          ) {
-            fields.value = txt.value;
-            console.log(fields);
-          }
-        }
-      }
-    }
+    // if (txt.global == true) {
+    //   for (const element of this.editableFields()) {
+    //     for (const fields of element) {
+    //       if (
+    //         fields.global != true &&
+    //         txt.htmlTxt == fields.htmlTxt &&
+    //         fields.isLinked == true
+    //       ) {
+    //         fields.value = txt.value;
+    //         console.log(fields);
+    //       }
+    //     }
+    //   }
+    // }
 
-    if (txt.type == 'btn' || txt.type == 'txt') {
-      let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
-      this.iframe.querySelector(`#${id}`).innerHTML = txt.value;
+    let id = 'sd_' + txt.type + '_' + txt.htmlTxt;
+
+    if (txt.type == 'btn' || txt.type == 'txt' ) {
+      console.log(this.iframe);
+      console.log(id);
+      
+      console.log(this.iframe.querySelectorAll(`#${id}`));
+      
+   
+      this.iframe.querySelector(`#${id}`).innerText = txt.value;
 
       if (txt.global != true && isLink == 'true') {
         txt.isLinked = false;

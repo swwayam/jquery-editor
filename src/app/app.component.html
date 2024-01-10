@@ -1,7 +1,6 @@
 <div style="display: flex; justify-content: space-between;">
 
     <ul>
-
         <li *ngFor="let size of sizes; index as i" (click)="showData(i)">{{size}}</li>
     </ul>
 
@@ -10,7 +9,7 @@
 
 
     <div id="fields">
-        @for (el of editableFields()[currentIndex]; track $index) {
+        @for (el of editableFields()[currentIndex()]; track $index) {
         <!-- @if (el.type == "txt") { -->
         <div>
             <label>{{el.htmlTxt}}</label>
@@ -48,7 +47,12 @@
          -->
         }
 
+<<<<<<< HEAD
         <iframe width="920" height="620" (load)="onIframeLoad(myFrame)" [src]="sanitized[currentIndex]"
             #myFrame></iframe>
+=======
+        <iframe width="900" height="600"  [src]="sanitized[currentIndex()]"
+           id="iframeM" #myFrame></iframe>
+>>>>>>> 2683e352cef2bb38567772fe1d61821e80aaee02
     </div>
 </div>
